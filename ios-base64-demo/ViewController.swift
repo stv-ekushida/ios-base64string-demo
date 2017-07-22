@@ -9,17 +9,48 @@
 import UIKit
 
 class ViewController: UIViewController {
+    
+    @IBOutlet weak var imageView: UIImageView!
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any additional setup after loading the view, typically from a nib.
+        imageView.image = strToUIImage(base64String: Image.jpeg())
     }
-
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
+    
+    /// Base64文字列をUIImageに変換
+    func strToUIImage(base64String: String) -> UIImage?{
+        
+        guard let decodedData = Data(base64Encoded: base64String, options: .ignoreUnknownCharacters) else {
+            return nil
+        }
+        return UIImage(data: decodedData)
     }
-
-
+    
+    /// 画像をBase64文字列に変換
+    func saveBase64Jpeg() {
+    
+        let image = #imageLiteral(resourceName: "cat1")
+        
+        let jpegCompressionQuality: CGFloat = 1
+        if let base64String = UIImageJPEGRepresentation(image, jpegCompressionQuality)?.base64EncodedString() {
+            save(base64String: base64String, type: ImageDataType.jpeg)
+        }
+    }
+    
+    func saveBase64Png() {
+        
+        let image = #imageLiteral(resourceName: "draemon")
+        
+        if let base64String = UIImagePNGRepresentation(image)?.base64EncodedString() {
+            save(base64String: base64String, type: ImageDataType.png)
+        }
+    }
+    
+    func save(base64String: String, type: ImageDataType) {
+        let imageData = ImageData()
+        imageData.imageData = base64String
+        imageData.imageDataType = type.rawValue
+        ImageDataDao.add(model: imageData)
+    }
 }
 
